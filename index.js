@@ -1,8 +1,12 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import authRouter from './authRouter.js'
 
 const port = 5000
 const app = express()
+
+app.use(express.json())
+app.use('/auth', authRouter)
 
 app.listen(port, (error) => {
     if (error) {
