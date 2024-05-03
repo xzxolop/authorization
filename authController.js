@@ -1,3 +1,6 @@
+import User from './models/User.js'
+import Role from './models/Role.js'
+
 class authController {
     async registration(request, response) {
         try {}
@@ -11,6 +14,10 @@ class authController {
 
     async getUsers(request, response) {
         try {
+            const userRole = new Role()
+            const adminRole = new Role({value: "admin"})
+            await userRole.save()
+            await adminRole.save()
             response.json('Server work')
         }
         catch(e) {}
