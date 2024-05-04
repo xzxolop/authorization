@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Schema } from 'mongoose'
+import readline from 'readline'
 
 async function dbConnect() {
     try {
@@ -7,36 +7,45 @@ async function dbConnect() {
         await mongoose.connect('mongodb+srv://user:pas@cluster0.wnp1u5i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
         console.log('You are connected')
     }
-    catch(e) {
+    catch (e) {
         console.log('Connection faild!')
         console.log(e)
     }
 }
 
-const Person = mongoose.model('Person', new Schema({
-    name: {type: String},
-    age: {type: Number}
-}));
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
 
-const Student = mongoose.model('Student', new Schema({
-    name: {type: String},
-    age: {Number},
-    university: {type: String}
-}));
+const Student = mongoose.model('Student', new mongoose.Schema({
+    name: { type: String },
+    age: { type: Number },
+    university: { type: String }
+}))
 
-async function WriteToDb() {
+async function writeToDb(studentData) {
     try {
-        const person = new Person({name: 'Ruslana', age: 19});
-        await person.save();
-        console.log('Person is saved');
-
-        const student = new Student({name: 'Ruslana', age: 19, university: 'UFU'});
-        await student.save();
-        console.log('Student is saved');
-    } catch (e) {
-        console.log(e);
+        const student = new Student(studentData)
+        await student.save()
+        console.log('Student saved to database:', student)
+    } catch (error) {
+        console.log('Error saving student to database:', error)
     }
 }
 
+async function collectStudentData() {
+    rl.question('Enter student name: ', async (name) => {
+        rl.question('Enter student age: ', async (age) => {
+            rl.question('Enter student university: ', async (university) => {
+                const studentData = { name, age, university }
+                await writeToDb(studentData)
+                rl.close()
+                process.exit(0)
+            })
+        })
+    })
+}
+
 dbConnect()
-WriteToDb()
+collectStudentData()
